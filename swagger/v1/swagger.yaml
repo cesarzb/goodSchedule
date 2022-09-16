@@ -14,7 +14,7 @@ paths:
         '200':
           description: authentication successful
         '401':
-          description: missing username
+          description: missing parameter (password or username) or they're wrong
       requestBody:
         content:
           application/json:
@@ -23,13 +23,15 @@ paths:
               properties:
                 username:
                   type: string
+                  default: Student99
                 password:
                   type: string
+                  default: Password1
               required:
               - username
               - password
 servers:
-- url: https://{defaultHost}
+- url: http://{defaultHost}
   variables:
     defaultHost:
-      default: www.example.com
+      default: localhost:3000/
