@@ -30,8 +30,23 @@ paths:
               required:
               - username
               - password
+  "/api/v1/deauthenticate":
+    delete:
+      summary: Returns no content
+      tags:
+      - Authentication
+      security:
+      - bearer_auth: []
+      responses:
+        '204':
+          description: user deauthenticated successfully
 servers:
 - url: http://{defaultHost}
   variables:
     defaultHost:
       default: localhost:3000/
+components:
+  securitySchemes:
+    bearer_auth:
+      type: http
+      scheme: bearer

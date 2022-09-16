@@ -3,7 +3,8 @@ Rails.application.routes.draw do
   mount Rswag::Api::Engine => '/api-docs'
   namespace :api do
     namespace :v1 do
-      post '/authenticate', to: 'authentication#create'
+      post   '/authenticate',   to: 'authentication#create'
+      delete '/deauthenticate', to: 'authentication#destroy'
     end
   end
 end

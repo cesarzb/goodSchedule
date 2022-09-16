@@ -8,6 +8,6 @@ class AuthTokenService
 
     def self.decode(token)
         decoded_token = JWT.decode token, Rails.application.credentials.secret_key_jwt, true, { algorithm: ALGORITHM_TYPE }
-        decoded_token[0][:user_id]
+        return decoded_token[0]['user_id']
     end
 end
