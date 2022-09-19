@@ -35,7 +35,7 @@ RSpec.describe ApplicationController, type: :controller do
             expect(response).to have_http_status(:unauthorized)
         end
 
-        it "returns" do
+        it "returns no content when token is valid" do
             headers = { 'Authorization': "Bearer #{AuthTokenService.encode(user.id)}" }
             request.headers.merge! headers
             get :index, params: {}

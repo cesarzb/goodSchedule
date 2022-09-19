@@ -7,6 +7,7 @@ RSpec.describe 'Authentication API', type: :request do
       post 'Returns a token' do
         tags 'Authentication'
         consumes 'application/json'
+        produces 'application/json'
         parameter name: :login_data, in: :body, schema: {
           type: :object,
           properties: {
@@ -68,7 +69,7 @@ RSpec.describe 'Authentication API', type: :request do
 
           schema type: :object,
             properties: {
-                error: { type: :string, default: 'param is missing or the value is empty: username' }
+              error: { type: :string, default: 'param is missing or the value is empty: username' }
             },
             required: [ 'error' ]
         end

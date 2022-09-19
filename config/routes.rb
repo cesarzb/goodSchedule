@@ -3,6 +3,9 @@ Rails.application.routes.draw do
   mount Rswag::Api::Engine => '/api-docs'
   namespace :api do
     namespace :v1 do
+      post '/signup', to: 'users#create'
+      #  get 'users/index'
+      #  delete 'users/:id/destroy'
       post   '/authenticate',   to: 'authentication#create'
       delete '/deauthenticate', to: 'authentication#destroy'
     end
