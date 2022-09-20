@@ -65,7 +65,14 @@ RSpec.describe 'Signup API', type: :request do
               }
             }
           },
-          required: [ 'errors' ]
+          required: [ 'errors' ],
+          example: {
+            errors: 
+            {
+              password: [ "can't be blank" ],
+              username: [ "can't be blank" ]
+            }
+          }
 
           let(:signup_data) { { user: FactoryBot.attributes_for(:user, username: '', password: '') } }
 

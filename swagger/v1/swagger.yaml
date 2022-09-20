@@ -59,8 +59,38 @@ paths:
         '204':
           description: user deauthenticated successfully
   "/api/v1/plans":
+    get:
+      summary: Returns all plans
+      tags:
+      - Plans
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: index for plan model
+          content:
+            application/json:
+              schema:
+                type: array
+                properties:
+                - type: object
+                  properties:
+                    name:
+                      type: string
+                      default: Plan99
+                    user_id:
+                      type: integer
+                      default: 1
+                  required:
+                  - name
+                  - user_id
+                example:
+                - name: Plan99
+                  user_id: 1
+        '401':
+          description: when user is unauthorized
     post:
-      summary: Returns created plan
+      summary: Returns a plan
       tags:
       - Plans
       security:
@@ -74,20 +104,48 @@ paths:
               schema:
                 type: object
                 properties:
-                  type: object
-                  properties:
-                    plan:
-                      type: object
-                      properties:
-                        name:
-                          type: string
-                          default: Plan99
-                        user_id:
-                          type: integer
-                          default: 1
-                      required:
-                      - name
-                      - user_id
+                  plan:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        default: Plan99
+                      user_id:
+                        type: integer
+                        default: 1
+                    required:
+                    - name
+                    - user_id
+        '422':
+          description: plan couldn't be created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      name:
+                        type: array
+                        properties:
+                        - type: string
+                          default: can't be blank
+                      user_id:
+                        type: array
+                        properties:
+                        - type: string
+                          default: can't be nil
+                required:
+                - errors
+                example:
+                  errors:
+                    name:
+                    - can't be blank
+                    user_id:
+                    - can't be nil
+        '401':
+          description: when user is unauthorized
       requestBody:
         content:
           application/json:
@@ -147,6 +205,12 @@ paths:
                           default: can't be blank
                 required:
                 - errors
+                example:
+                  errors:
+                    password:
+                    - can't be blank
+                    username:
+                    - can't be blank
       requestBody:
         content:
           application/json:

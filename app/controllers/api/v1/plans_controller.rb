@@ -21,7 +21,7 @@ class Api::V1::PlansController < ApplicationController
     if @plan.save
       render json: @plan, status: :created
     else
-      render json: @plan.errors, status: :unprocessable_entity
+      render json: { errors: @plan.errors }, status: :unprocessable_entity
     end
   end
 
@@ -30,7 +30,7 @@ class Api::V1::PlansController < ApplicationController
     if @plan.update(plan_params)
       render json: @plan
     else
-      render json: @plan.errors, status: :unprocessable_entity
+      render json: { errors: @plan.errors }, status: :unprocessable_entity
     end
   end
 
