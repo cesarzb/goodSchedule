@@ -9,7 +9,7 @@ module Api
             rescue_from AuthenticationController::AuthenticationError, with: :authentication_error
 
             def create
-                raise AuthenticationError unless user.authenticate(params.require(:password))
+                raise AuthenticationError unless !user.nil? && user.authenticate(params.require(:password))
                 token = AuthTokenService.encode(user.id)
                 user.update(token_expiration: 14.days.from_now)
 

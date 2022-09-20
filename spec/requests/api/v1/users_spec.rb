@@ -75,7 +75,7 @@ RSpec.describe 'Signup API', type: :request do
           
             expect(response).to have_http_status(:unprocessable_entity)
             expect(response.body).to eq(
-              { errors: { username: [ "can't be blank" ] } }.to_json
+              { errors: { username: [ "can't be blank", "is too short (minimum is 3 characters)"] } }.to_json
             )
           end
 
@@ -85,7 +85,7 @@ RSpec.describe 'Signup API', type: :request do
           
             expect(response).to have_http_status(:unprocessable_entity)
             expect(response.body).to eq(
-              { errors: { password: [ "can't be blank" ] } }.to_json
+              { errors: { password: [ "can't be blank", "is too short (minimum is 8 characters)" ] } }.to_json
             )
           end
         end

@@ -58,6 +58,54 @@ paths:
       responses:
         '204':
           description: user deauthenticated successfully
+  "/api/v1/plans":
+    post:
+      summary: Returns created plan
+      tags:
+      - Plans
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: plan created successfuly
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type: object
+                  properties:
+                    plan:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          default: Plan99
+                        user_id:
+                          type: integer
+                          default: 1
+                      required:
+                      - name
+                      - user_id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                plan:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      default: Plan99
+                    user_id:
+                      type: integer
+                      default: 1
+                  required:
+                  - name
+                  - user_id
   "/api/v1/signup":
     post:
       summary: Returns a token

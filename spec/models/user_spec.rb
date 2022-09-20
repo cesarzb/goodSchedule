@@ -25,6 +25,12 @@ RSpec.describe User, type: :model do
             expect(user).not_to be_valid
         end
 
+        it 'is not valid if user alread exists' do
+            other_user = FactoryBot.build(:user, username: user.username)
+            user.save
+
+            expect(other_user).not_to be_valid
+        end
     end
 
     describe 'password' do
