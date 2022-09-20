@@ -5,8 +5,8 @@ RSpec.describe "Plan API", type: :request do
   let!(:user)               { FactoryBot.create(:user) }
   let!(:Authorization)      { "Bearer #{AuthTokenService.encode(user.id)}" }
   let!(:valid_header)       { { "Authorization": "Bearer #{AuthTokenService.encode(user.id)}" } }
-
-  describe '/plans' do    
+  let!(:plan)               { FactoryBot.create(:plan, user: user) }
+  
     path '/api/v1/plans' do
       get 'Returns all plans' do
         tags 'Plans'
@@ -34,7 +34,7 @@ RSpec.describe "Plan API", type: :request do
           run_test!
         end
 
-        response '401', 'when user is unauthorized' do
+        response '401', 'user is unauthorized' do
           let!(:Authorization)  { nil }
           run_test!
         end
@@ -58,6 +58,7 @@ RSpec.describe "Plan API", type: :request do
             }
           }
         }
+        
         
         response '201', 'plan created successfuly' do
           schema type: :object,
@@ -109,7 +110,7 @@ RSpec.describe "Plan API", type: :request do
                   properties: [
                     { type: :string, default: "can't be nil" }
                   ]
-                },
+                }
               }
             }
           },
@@ -141,58 +142,173 @@ RSpec.describe "Plan API", type: :request do
           run_test!
         end
 
-        response '401', 'when user is unauthorized' do
+        response '401', 'user is unauthorized' do
           let(:plans_data)  { { plan: { name: '', user_id: nil } } }
           let(:Authorization) { nil }
           run_test!
         end
       end
     end
-  end
+
+   
+  path "/api/v1/plans/{id}" do
+    
+    get 'Returns specified plan' do
+      tags 'Plans'
+      security [ bearer_auth: [] ]
+      produces 'application/json'
+      parameter name: :id, in: :path, type: :integer
+
+      response '200', 'when plan exists' do
+        schema type: :object,
+        properties: {
+          plan: { 
+            type: :object, 
+            properties: {
+              name: { type: :string, default: 'Plan99' },
+              user_id: { type: :integer, default: 1 }
+            },
+            required: [ 'name', 'user_id' ]
+          }
+        }
+        
+        let(:id) { plan.id }
+        run_test!
+      end
+
+      response '401', 'user is unauthorized' do
+        let!(:Authorization)  { nil }
+        
+        let(:id) { plan.id }
+        run_test!
+      end
+
+      response '404', "plan with specified id doesn't exist" do        
+        let(:id) { plan.id + 1}
+        run_test!
+      end
+    end
+      
+
+    put 'Updates specified plan' do
+      tags 'Plans'
+      security [ bearer_auth: [] ]
+      produces 'application/json'
+      consumes 'application/json'
+      parameter name: :id, in: :path, type: :integer
+      parameter name: :plans_data, in: :body, schema: {
+        type: :object,
+        properties: {
+          plan: { 
+            type: :object, 
+            properties: {
+              name: { type: :string, default: 'Plan99' },
+              user_id: { type: :integer, default: 1 }
+            },
+            required: [ 'name', 'user_id' ]
+          }
+        }
+      }
+      
+      let(:id)  { plan.id }
+
+      response '200', 'plan updated successfully' do
+        schema type: :object,
+        properties: {
+          plan: { 
+            type: :object, 
+            properties: {
+              name: { type: :string, default: 'Plan99' },
+              user_id: { type: :integer, default: 1 }
+            },
+            required: [ 'name', 'user_id' ]
+          }
+        }
+        
+        let(:plans_data)  { { plan: { name: 'changed', user_id: user.id } } }
+        
+        it "updates the requested plan" do
+          patch api_v1_plan_url(plan),
+                params: plans_data, headers: valid_header, as: :json
+          plan.reload
+          expect(plan.name).to eq('changed')
+        end
+        
+        it "renders a JSON response with the plan" do
+          patch api_v1_plan_url(plan),
+                params: plans_data, headers: valid_header, as: :json
+          expect(response).to have_http_status(:ok)
+          expect(response.content_type).to match(a_string_including("application/json"))
+        end
+
+        run_test!
+      end
+
+      response '422', 'wrong update parameters' do
+        let(:plans_data)  { { plan: { name: '', user: nil }  } }
+
+        it "renders a JSON response with errors for the plan" do
+          patch api_v1_plan_url(plan),
+                params: plans_data, headers: valid_header, as: :json
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.content_type).to match(a_string_including("application/json"))
+        end
+
+        run_test!
+      end
+
+      response '401', 'user is unauthorized' do
+        let!(:Authorization)  { nil }
+        let(:plans_data)      { { plan: FactoryBot.attributes_for(:plan, user_id: user.id) } }
+        
+        run_test!
+      end
+
+      response '404', "plan with specified id doesn't exist" do        
+        let(:plans_data)  { { plan: FactoryBot.attributes_for(:plan, user_id: user.id) } }
+        let(:id)          { plan.id + 1}
+
+        run_test!
+      end
+    end
+
+
+    delete 'Deletes specified plan' do
+      tags 'Plans'
+      security [ bearer_auth: [] ]
+      consumes 'application/json'
+      produces 'application/json'
+      parameter name: :id, in: :path, type: :integer
+
+      response '204', 'plan deleted successfully' do
+        let(:id) { plan.id }
+        let!(:other_plan) { FactoryBot.create(:plan, user: user) }
+
+        it "destroys the requested plan" do
+          expect {
+            delete api_v1_plan_url(other_plan), headers: valid_header, as: :json
+          }.to change(Plan, :count).by(-1)
+        end
+
+        run_test!
+      end
+      
+      response '401', 'user is unauthorized' do
+        let!(:Authorization)  { nil }
+        let(:id)              { plan.id}
+
+        run_test!
+      end
+      
+      response '404', "plan with specified id doesn't exist" do        
+        let(:id)  { plan.id + 1}
+
+        run_test!
+      end
+    end
+  end    
 end
 
-#
-#  describe "PATCH /update" do
-#    context "with valid parameters" do
-#      let(:new_attributes) {
-#        skip("Add a hash of attributes valid for your model")
-#      }
-#
-#      it "updates the requested plan" do
-#        plan = Plan.create! valid_attributes
-#        patch api_v1_plan_url(plan),
-#              params: { plan: new_attributes }, headers: valid_headers, as: :json
-#        plan.reload
-#        skip("Add assertions for updated state")
-#      end
-#
-#      it "renders a JSON response with the plan" do
-#        plan = Plan.create! valid_attributes
-#        patch api_v1_plan_url(plan),
-#              params: { plan: new_attributes }, headers: valid_headers, as: :json
-#        expect(response).to have_http_status(:ok)
-#        expect(response.content_type).to match(a_string_including("application/json"))
-#      end
-#    end
-#
-#    context "with invalid parameters" do
-#      it "renders a JSON response with errors for the plan" do
-#        plan = Plan.create! valid_attributes
-#        patch api_v1_plan_url(plan),
-#              params: { plan: invalid_attributes }, headers: valid_headers, as: :json
-#        expect(response).to have_http_status(:unprocessable_entity)
-#        expect(response.content_type).to match(a_string_including("application/json"))
-#      end
-#    end
-#  end
-#
-#  describe "DELETE /destroy" do
-#    it "destroys the requested plan" do
-#      plan = Plan.create! valid_attributes
-#      expect {
-#        delete api_v1_plan_url(plan), headers: valid_headers, as: :json
-#      }.to change(Plan, :count).by(-1)
-#    end
-#  end
-#end
-#
+
+
+

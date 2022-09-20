@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :plans
-          post '/signup', to: 'users#create'
+      post '/signup', to: 'users#create'
       #  get 'users/index'
       #  delete 'users/:id/destroy'
       post   '/authenticate',   to: 'authentication#create'

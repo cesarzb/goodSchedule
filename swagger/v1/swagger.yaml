@@ -88,7 +88,7 @@ paths:
                 - name: Plan99
                   user_id: 1
         '401':
-          description: when user is unauthorized
+          description: user is unauthorized
     post:
       summary: Returns a plan
       tags:
@@ -145,7 +145,7 @@ paths:
                     user_id:
                     - can't be nil
         '401':
-          description: when user is unauthorized
+          description: user is unauthorized
       requestBody:
         content:
           application/json:
@@ -164,6 +164,118 @@ paths:
                   required:
                   - name
                   - user_id
+  "/api/v1/plans/{id}":
+    get:
+      summary: Returns specified plan
+      tags:
+      - Plans
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: when plan exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plan:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        default: Plan99
+                      user_id:
+                        type: integer
+                        default: 1
+                    required:
+                    - name
+                    - user_id
+        '401':
+          description: user is unauthorized
+        '404':
+          description: plan with specified id doesn't exist
+    put:
+      summary: Updates specified plan
+      tags:
+      - Plans
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: plan updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plan:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        default: Plan99
+                      user_id:
+                        type: integer
+                        default: 1
+                    required:
+                    - name
+                    - user_id
+        '422':
+          description: wrong update parameters
+        '401':
+          description: user is unauthorized
+        '404':
+          description: plan with specified id doesn't exist
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                plan:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      default: Plan99
+                    user_id:
+                      type: integer
+                      default: 1
+                  required:
+                  - name
+                  - user_id
+    delete:
+      summary: Deletes specified plan
+      tags:
+      - Plans
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        '204':
+          description: plan deleted successfully
+        '401':
+          description: user is unauthorized
+        '404':
+          description: plan with specified id doesn't exist
   "/api/v1/signup":
     post:
       summary: Returns a token

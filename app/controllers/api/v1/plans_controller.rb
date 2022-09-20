@@ -1,6 +1,7 @@
 class Api::V1::PlansController < ApplicationController
-  before_action :set_plan, only: %i[ show update destroy ]
   before_action :authenticate_user
+  before_action :set_plan, only: %i[ show update destroy is_user_owner? ]
+  #before_action :is_user_owner?
 
   # GET /api/v1/plans
   def index
@@ -40,9 +41,14 @@ class Api::V1::PlansController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
+    #def is_user_owner?
+    #  render status: :unauthorized unless @plan.user == @current_user
+    #end
+
     def set_plan
       @plan = Plan.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      not_found
     end
 
     # Only allow a list of trusted parameters through.
