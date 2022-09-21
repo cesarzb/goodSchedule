@@ -5,10 +5,14 @@ class ApplicationController < ActionController::API
     def authenticate_user
         token, _options = token_and_options(request)
         user_id = AuthTokenService.decode(token)
-        #@current_user = User.find(user_id)
         raise TokenExpired unless User.find(user_id).token_valid?
     rescue ActiveRecord::RecordNotFound, JWT::DecodeError, TokenExpired
         render status: :unauthorized
+    end
+
+    def current_user
+        token, _options = token_and_options(request)
+        User.find(AuthTokenService.decode(token))
     end
 
     def not_found

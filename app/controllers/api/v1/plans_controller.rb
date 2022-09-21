@@ -1,11 +1,11 @@
 class Api::V1::PlansController < ApplicationController
   before_action :authenticate_user
   before_action :set_plan, only: %i[ show update destroy is_user_owner? ]
-  #before_action :is_user_owner?
+  before_action :is_user_owner?, only: %i[ show update destroy ]
 
   # GET /api/v1/plans
   def index
-    @plans = Plan.all
+    @plans = user.plans#Plan.all
 
     render json: @plans
   end
@@ -41,14 +41,18 @@ class Api::V1::PlansController < ApplicationController
   end
 
   private
-    #def is_user_owner?
-    #  render status: :unauthorized unless @plan.user == @current_user
-    #end
-
-    def set_plan
+    def set_plan      
       @plan = Plan.find(params[:id])
     rescue ActiveRecord::RecordNotFound
       not_found
+    end
+
+    def user
+      @user ||= current_user
+    end
+
+    def is_user_owner?
+      render status: :unauthorized unless @plan.user == user
     end
 
     # Only allow a list of trusted parameters through.

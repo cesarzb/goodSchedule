@@ -24,10 +24,19 @@ RSpec.configure do |config|
       paths: {},
       servers: [
         {
-          url: 'http://{defaultHost}',
+          url: 'http://{developmentHost}',
           variables: {
-            defaultHost: {
+            developmentHost: {
               default: 'localhost:3000/'
+            }
+          }
+        },
+
+        {
+          url: 'https://{productiontHost}',
+          variables: {
+            productiontHost: {
+              default: 'goodschedule.fly.dev/'
             }
           }
         }
