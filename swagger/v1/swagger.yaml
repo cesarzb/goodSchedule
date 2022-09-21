@@ -349,7 +349,7 @@ servers:
 - url: https://{productiontHost}
   variables:
     productiontHost:
-      default: goodschedule.fly.dev/
+      default: goodschedule.herokuapp.com/
 components:
   securitySchemes:
     bearer_auth:
