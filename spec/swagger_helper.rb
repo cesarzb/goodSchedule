@@ -36,7 +36,7 @@ RSpec.configure do |config|
           url: 'https://{productiontHost}',
           variables: {
             productiontHost: {
-              default: 'goodschedule.fly.dev/'
+              default: 'goodschedule.herokuapp.com/'
             }
           }
         }
