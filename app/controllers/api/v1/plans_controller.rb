@@ -18,6 +18,7 @@ class Api::V1::PlansController < ApplicationController
   # POST /api/v1/plans
   def create
     @plan = Plan.new(plan_params)
+    @plan.user_id = user.id
 
     if @plan.save
       render json: @plan, status: :created
@@ -57,6 +58,6 @@ class Api::V1::PlansController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def plan_params
-      params.require(:plan).permit(:name, :user_id)
+      params.require(:plan).permit(:name)
     end
 end
