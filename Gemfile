@@ -7,6 +7,7 @@ gem 'rswag'
 gem 'rspec-rails'
 gem 'factory_bot_rails'
 gem 'faker'
+gem 'rack-cors'
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 7.0.4"
