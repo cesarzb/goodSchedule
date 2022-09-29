@@ -299,7 +299,7 @@ paths:
                 required:
                 - token
         '422':
-          description: missing or wrong parameter (probably validations)
+          description: missing or wrong parameter
           content:
             application/json:
               schema:
@@ -318,11 +318,18 @@ paths:
                         properties:
                         - type: string
                           default: can't be blank
+                      password_confirmation:
+                        type: array
+                        properties:
+                        - type: string
+                          default: can't be blank
                 required:
                 - errors
                 example:
                   errors:
                     password:
+                    - can't be blank
+                    password_confirmation:
                     - can't be blank
                     username:
                     - can't be blank
@@ -341,9 +348,13 @@ paths:
                     password:
                       type: string
                       default: Password1
+                    password_confirmation:
+                      type: string
+                      default: Password1
                   required:
                   - username
                   - password
+                  - password_confirmation
 servers:
 - url: http://{developmentHost}
   variables:

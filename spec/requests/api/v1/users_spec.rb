@@ -14,10 +14,11 @@ RSpec.describe 'Signup API', type: :request do
             user: { 
               type: :object, 
               properties: {
-                username: { type: :string, default: 'Student99' },
-                password: { type: :string, default: 'Password1' }
+                username:              { type: :string, default: 'Student99' },
+                password:              { type: :string, default: 'Password1' },
+                password_confirmation: { type: :string, default: 'Password1' }
               },
-              required: [ 'username', 'password' ]
+              required: [ 'username', 'password', 'password_confirmation' ]
             }
           }
         }
@@ -44,7 +45,7 @@ RSpec.describe 'Signup API', type: :request do
           end
         end
 
-        response '422', 'missing or wrong parameter (probably validations)' do
+        response '422', 'missing or wrong parameter' do
           schema type: :object,
           properties: {
             errors: {
@@ -62,6 +63,12 @@ RSpec.describe 'Signup API', type: :request do
                     { type: :string, default: "can't be blank" }
                   ]
                 },
+                password_confirmation: {
+                  type: :array, 
+                  properties: [
+                    { type: :string, default: "can't be blank" }
+                  ]
+                }
               }
             }
           },
@@ -69,15 +76,16 @@ RSpec.describe 'Signup API', type: :request do
           example: {
             errors: 
             {
-              password: [ "can't be blank" ],
-              username: [ "can't be blank" ]
+              password:               [ "can't be blank" ],
+              password_confirmation:  [ "can't be blank" ],
+              username:               [ "can't be blank" ]
             }
           }
 
-          let(:signup_data) { { user: FactoryBot.attributes_for(:user, username: '', password: '') } }
+          let(:signup_data) { { user: FactoryBot.attributes_for(:user) } }
 
           it 'returns unprocessable entity status when username is missing' do
-            signup_data[:user][:password] = "Password1"
+            signup_data[:user][:username] = ''
             post '/api/v1/signup', params: signup_data
           
             expect(response).to have_http_status(:unprocessable_entity)
@@ -87,12 +95,25 @@ RSpec.describe 'Signup API', type: :request do
           end
 
           it 'returns unprocessable entity status when password is missing' do
-            signup_data[:user][:username] = "Student99"
+            signup_data[:user][:password] = ''
             post '/api/v1/signup', params: signup_data
           
             expect(response).to have_http_status(:unprocessable_entity)
             expect(response.body).to eq(
-              { errors: { password: [ "can't be blank", "is too short (minimum is 8 characters)" ] } }.to_json
+              { errors: {
+                  password: [ "can't be blank", "is too short (minimum is 8 characters)" ],
+                  password_confirmation: [ "doesn't match Password"]
+                } }.to_json
+            )
+          end
+
+          it 'returns unprocessable entity status when password confirmation is missing' do
+            signup_data[:user][:password_confirmation] = ''
+            post '/api/v1/signup', params: signup_data
+          
+            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response.body).to eq(
+              { errors: { password_confirmation: [ "doesn't match Password", "can't be blank" ] } }.to_json
             )
           end
         end
