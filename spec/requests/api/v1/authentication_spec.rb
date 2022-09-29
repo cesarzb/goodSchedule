@@ -11,12 +11,12 @@ RSpec.describe 'Authentication API', type: :request do
         parameter name: :login_data, in: :body, schema: {
           type: :object,
           properties: {
-            user: {
-              type: :object,
+            user: { 
+              type: :object, 
               properties: {
                 username: { type: :string, default: 'Student99' },
                 password: { type: :string, default: 'Password1' }
-              }, 
+              },
               required: [ 'username', 'password' ]
             }
           }

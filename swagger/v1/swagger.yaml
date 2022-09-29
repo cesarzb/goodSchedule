@@ -39,15 +39,18 @@ paths:
             schema:
               type: object
               properties:
-                username:
-                  type: string
-                  default: Student99
-                password:
-                  type: string
-                  default: Password1
-              required:
-              - username
-              - password
+                user:
+                  type: object
+                  properties:
+                    username:
+                      type: string
+                      default: Student99
+                    password:
+                      type: string
+                      default: Password1
+                  required:
+                  - username
+                  - password
   "/api/v1/deauthenticate":
     delete:
       summary: Returns no content
