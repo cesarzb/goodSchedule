@@ -34,10 +34,6 @@ module Api
                 @user ||= User.find_by(username: params.require(:user).require(:username))
             end
 
-            #def user_params
-            #    params.require(:user).permit(:username, :password)
-            #end
-
             def parameter_missing(e)
                 render json: { error: e }, status: :unauthorized
             end

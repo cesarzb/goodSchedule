@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-  before_action :authenticate_user, only: %i[ index destroy ]
+  before_action :authenticate_user, only: %i[ index destroy show ]
   
   def create
     user = User.new(user_params)
@@ -14,7 +14,10 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
-
+  #def show
+  #  render json: { user: { username: current_user.username, created_at: current_user.created_at, last_login:  } }
+  #end
+  
   # index and destroy actions are for admin users
   # that are yet to be added
   def index

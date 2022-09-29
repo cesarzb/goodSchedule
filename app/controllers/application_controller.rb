@@ -11,6 +11,10 @@ class ApplicationController < ActionController::API
     end
 
     def current_user
+        @current_user ||= set_current_user
+    end
+
+    def set_current_user
         token, _options = token_and_options(request)
         User.find(AuthTokenService.decode(token))
     end
