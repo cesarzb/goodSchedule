@@ -9,7 +9,7 @@ module Api
             rescue_from AuthenticationController::AuthenticationError, with: :authentication_error
 
             def create
-                raise AuthenticationError unless !user.nil? && user.authenticate(params.require(:password))
+                raise AuthenticationError unless !user.nil? && user.authenticate(params.require(:user).require(:password))
                 token = AuthTokenService.encode(user.id)
                 user.update(token_expiration: 14.days.from_now)
 
@@ -31,8 +31,12 @@ module Api
             end
 
             def user
-                @user ||= User.find_by(username: params.require(:username))
+                @user ||= User.find_by(username: params.require(:user).require(:username))
             end
+
+            #def user_params
+            #    params.require(:user).permit(:username, :password)
+            #end
 
             def parameter_missing(e)
                 render json: { error: e }, status: :unauthorized

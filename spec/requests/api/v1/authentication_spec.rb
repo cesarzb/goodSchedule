@@ -11,17 +11,22 @@ RSpec.describe 'Authentication API', type: :request do
         parameter name: :login_data, in: :body, schema: {
           type: :object,
           properties: {
-            username: { type: :string, default: 'Student99' },
-            password: { type: :string, default: 'Password1' }
-          }, 
-          required: [ 'username', 'password' ]
+            user: {
+              type: :object,
+              properties: {
+                username: { type: :string, default: 'Student99' },
+                password: { type: :string, default: 'Password1' }
+              }, 
+              required: [ 'username', 'password' ]
+            }
+          }
         }
     
         response '200', 'authentication successful' do
           let(:user) { FactoryBot.create(:user) }
           
           it 'returns success status for username and password' do
-            post '/api/v1/authenticate', params: { username: user.username, password: user.password }
+            post '/api/v1/authenticate', params: { user: { username: user.username, password: user.password } }
           
             token = AuthTokenService.encode(user.id)
           
@@ -41,7 +46,7 @@ RSpec.describe 'Authentication API', type: :request do
           let(:user) { FactoryBot.create(:user) }
 
           it 'returns unauthorized when username is missing' do
-            post '/api/v1/authenticate', params: { password: user.password }
+            post '/api/v1/authenticate', params: { user: { password: user.password } }
           
             expect(response).to have_http_status(:unauthorized)
             expect(response.body).to eq(
@@ -50,7 +55,7 @@ RSpec.describe 'Authentication API', type: :request do
           end
 
           it 'returns unauthorized when password is missing' do
-            post '/api/v1/authenticate', params: { username: user.username }
+            post '/api/v1/authenticate', params: { user: { username: user.username } }
           
             expect(response).to have_http_status(:unauthorized)
             expect(response.body).to eq(
@@ -59,7 +64,7 @@ RSpec.describe 'Authentication API', type: :request do
           end
 
           it 'returns unauthorized when password is incorrect' do
-            post '/api/v1/authenticate', params: { username: user.username, password: 'incorrect' }
+            post '/api/v1/authenticate', params: { user: { username: user.username, password: 'incorrect' } }
           
             expect(response).to have_http_status(:unauthorized)
             expect(response.body).to eq(
