@@ -5,7 +5,7 @@ module Api
             class AuthenticationError < StandardError; end
             before_action :authenticate_user, only: :destroy
             
-            rescue_from ActionController::ParameterMissing, with: :parameter_missing
+            rescue_from ActionController::ParameterMissing, with: :param_missing
             rescue_from AuthenticationController::AuthenticationError, with: :authentication_error
 
             def create
@@ -26,16 +26,16 @@ module Api
 
             private
 
+            def param_missing(e)
+                parameter_missing(e, :unauthorized)
+            end
+
             def authentication_error
-                render json: { error: 'Username or password is incorrect' }, status: :unauthorized
+                render json: { errors: { 'Username or password': [ 'is incorrect' ] } }, status: :unauthorized
             end
 
             def user
                 @user ||= User.find_by(username: params.require(:user).require(:username))
-            end
-
-            def parameter_missing(e)
-                render json: { error: e }, status: :unauthorized
             end
         end
     end

@@ -1,7 +1,7 @@
 class Api::V1::UsersController < ApplicationController
   before_action :authenticate_user, only: %i[ index destroy show change_password ]
   
-  rescue_from ActionController::ParameterMissing, with: :parameter_missing
+  rescue_from ActionController::ParameterMissing, with: :param_missing
 
   def create
     user = User.new(user_params)
@@ -20,9 +20,10 @@ class Api::V1::UsersController < ApplicationController
     current_user.password = params.require(:password)
     current_user.password_confirmation = params.require(:password_confirmation)
     if current_user.save
+      @current_user.reload
       render status: :ok
     else
-      render status: :unprocessable_entity
+      render json: { errors: e }, status: :unprocessable_entity
     end
   end
 
@@ -40,8 +41,8 @@ class Api::V1::UsersController < ApplicationController
 
   private
 
-  def parameter_missing(e)
-    render json: { error: e }, status: :unprocessable_entity
+  def param_missing(e)
+    parameter_missing(e, :unprocessable_entity)
   end
   
   def user_params

@@ -22,17 +22,26 @@ paths:
                     type: string
                     default: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxfQ.zCGBEiC4n4X5jij4lK4nSEtrbebYxELZ6OfBwdm6CJg
         '401':
-          description: missing parameter (password or username) or they're wrong
+          description: missing or incorrect parameter (password or username)
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  error:
-                    type: string
-                    default: 'param is missing or the value is empty: username'
+                  errors:
+                    type: object
+                    properties:
+                      Username or password:
+                        type: array
+                        properties:
+                        - type: string
+                          default: is incorrect
                 required:
-                - error
+                - errors
+                example:
+                  errors:
+                    Username or password:
+                    - is incorrect
       requestBody:
         content:
           application/json:
@@ -283,7 +292,7 @@ paths:
     post:
       summary: Returns a token
       tags:
-      - Signup
+      - User
       parameters: []
       responses:
         '201':
@@ -355,6 +364,53 @@ paths:
                   - username
                   - password
                   - password_confirmation
+  "/api/v1/change-password":
+    post:
+      summary: Returns OK
+      tags:
+      - User
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: password change successful
+        '422':
+          description: password change unsuccessful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      Username or password:
+                        type: array
+                        properties:
+                        - type: string
+                          default: is incorrect
+                required:
+                - errors
+                example:
+                  errors:
+                    Username or password:
+                    - is incorrect
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  default: new_password
+                password_confirmation:
+                  type: string
+                  default: new_password
+              required:
+              - password
+              - password_confirmation
 servers:
 - url: http://{developmentHost}
   variables:

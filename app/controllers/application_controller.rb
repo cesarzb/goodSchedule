@@ -22,4 +22,9 @@ class ApplicationController < ActionController::API
     def not_found
         render status: :not_found
     end
+
+    def parameter_missing(e, status)
+        error = e.to_s.split(': ')
+        render json: { errors: { "#{error[1].capitalize}": [ error[0] ] } }, status: status
+    end
 end
