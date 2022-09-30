@@ -5,7 +5,7 @@ class Api::V1::PlansController < ApplicationController
 
   # GET /api/v1/plans
   def index
-    @plans = user.plans#Plan.all
+    @plans = current_user.plans#Plan.all
 
     render json: @plans
   end
@@ -18,7 +18,7 @@ class Api::V1::PlansController < ApplicationController
   # POST /api/v1/plans
   def create
     @plan = Plan.new(plan_params)
-    @plan.user_id = user.id
+    @plan.user_id = current_user.id
 
     if @plan.save
       render json: @plan, status: :created
@@ -48,12 +48,8 @@ class Api::V1::PlansController < ApplicationController
       not_found
     end
 
-    def user
-      @user ||= current_user
-    end
-
     def is_user_owner?
-      render status: :unauthorized unless @plan.user == user
+      render status: :unauthorized unless @plan.user == current_user
     end
 
     # Only allow a list of trusted parameters through.

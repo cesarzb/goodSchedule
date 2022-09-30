@@ -4,7 +4,7 @@ info:
   title: API V1
   version: v1
 paths:
-  "/api/v1/authenticate":
+  "/api/v1/login":
     post:
       summary: Returns a token
       tags:
@@ -51,7 +51,7 @@ paths:
                   required:
                   - username
                   - password
-  "/api/v1/deauthenticate":
+  "/api/v1/logout":
     delete:
       summary: Returns no content
       tags:
@@ -279,7 +279,7 @@ paths:
           description: user is unauthorized
         '404':
           description: plan with specified id doesn't exist
-  "/api/v1/signup":
+  "/api/v1/register":
     post:
       summary: Returns a token
       tags:

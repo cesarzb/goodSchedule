@@ -2,8 +2,8 @@ require 'rails_helper'
 require 'swagger_helper'
 
 RSpec.describe 'Signup API', type: :request do
-  describe '/signup' do
-    path '/api/v1/signup' do
+  describe '/register' do
+    path '/api/v1/register' do
       post 'Returns a token' do
         tags 'Signup'
         consumes 'application/json'
@@ -33,7 +33,7 @@ RSpec.describe 'Signup API', type: :request do
           let(:signup_data) { { user: FactoryBot.attributes_for(:user) } }
 
           it 'returns created status for correct username and password' do
-            post '/api/v1/signup', params: signup_data
+            post '/api/v1/register', params: signup_data
             user = User.first
 
             token = AuthTokenService.encode(user.id)
@@ -86,7 +86,7 @@ RSpec.describe 'Signup API', type: :request do
 
           it 'returns unprocessable entity status when username is missing' do
             signup_data[:user][:username] = ''
-            post '/api/v1/signup', params: signup_data
+            post '/api/v1/register', params: signup_data
           
             expect(response).to have_http_status(:unprocessable_entity)
             expect(response.body).to eq(
@@ -96,7 +96,7 @@ RSpec.describe 'Signup API', type: :request do
 
           it 'returns unprocessable entity status when password is missing' do
             signup_data[:user][:password] = ''
-            post '/api/v1/signup', params: signup_data
+            post '/api/v1/register', params: signup_data
           
             expect(response).to have_http_status(:unprocessable_entity)
             expect(response.body).to eq(
@@ -109,7 +109,7 @@ RSpec.describe 'Signup API', type: :request do
 
           it 'returns unprocessable entity status when password confirmation is missing' do
             signup_data[:user][:password_confirmation] = ''
-            post '/api/v1/signup', params: signup_data
+            post '/api/v1/register', params: signup_data
           
             expect(response).to have_http_status(:unprocessable_entity)
             expect(response.body).to eq(

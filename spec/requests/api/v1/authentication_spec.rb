@@ -2,8 +2,8 @@ require 'rails_helper'
 require 'swagger_helper'
 
 RSpec.describe 'Authentication API', type: :request do
-  describe '/authenticate' do    
-    path '/api/v1/authenticate' do
+  describe '/login' do    
+    path '/api/v1/login' do
       post 'Returns a token' do
         tags 'Authentication'
         consumes 'application/json'
@@ -26,7 +26,7 @@ RSpec.describe 'Authentication API', type: :request do
           let(:user) { FactoryBot.create(:user) }
           
           it 'returns success status for username and password' do
-            post '/api/v1/authenticate', params: { user: { username: user.username, password: user.password } }
+            post '/api/v1/login', params: { user: { username: user.username, password: user.password } }
           
             token = AuthTokenService.encode(user.id)
           
@@ -46,7 +46,7 @@ RSpec.describe 'Authentication API', type: :request do
           let(:user) { FactoryBot.create(:user) }
 
           it 'returns unauthorized when username is missing' do
-            post '/api/v1/authenticate', params: { user: { password: user.password } }
+            post '/api/v1/login', params: { user: { password: user.password } }
           
             expect(response).to have_http_status(:unauthorized)
             expect(response.body).to eq(
@@ -55,7 +55,7 @@ RSpec.describe 'Authentication API', type: :request do
           end
 
           it 'returns unauthorized when password is missing' do
-            post '/api/v1/authenticate', params: { user: { username: user.username } }
+            post '/api/v1/login', params: { user: { username: user.username } }
           
             expect(response).to have_http_status(:unauthorized)
             expect(response.body).to eq(
@@ -64,7 +64,7 @@ RSpec.describe 'Authentication API', type: :request do
           end
 
           it 'returns unauthorized when password is incorrect' do
-            post '/api/v1/authenticate', params: { user: { username: user.username, password: 'incorrect' } }
+            post '/api/v1/login', params: { user: { username: user.username, password: 'incorrect' } }
           
             expect(response).to have_http_status(:unauthorized)
             expect(response.body).to eq(
@@ -86,7 +86,7 @@ RSpec.describe 'Authentication API', type: :request do
 
     #let(:authorization) { "Bearer #{AuthTokenService.encode(user.id)}" }
 
-    path '/api/v1/deauthenticate' do
+    path '/api/v1/logout' do
       delete 'Returns no content' do
         tags 'Authentication'
         security [ bearer_auth: [] ]
@@ -97,7 +97,7 @@ RSpec.describe 'Authentication API', type: :request do
           #let(:api_key) { 'bar-foo' }
           run_test!
           #it 'returns no content for valid token' do
-          #  delete '/api/v1/deauthenticate', headers: 
+          #  delete '/api/v1/logout', headers: 
           #  { 
           #    "Authorization": authorization
           #  }
