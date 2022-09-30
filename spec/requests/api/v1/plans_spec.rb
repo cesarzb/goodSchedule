@@ -151,8 +151,7 @@ RSpec.describe "Plan API", type: :request do
     end
 
    
-  path "/api/v1/plans/{id}" do
-    
+  path "/api/v1/plans/{id}" do 
     get 'Returns specified plan' do
       tags 'Plans'
       security [ bearer_auth: [] ]

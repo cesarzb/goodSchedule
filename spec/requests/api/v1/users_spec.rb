@@ -187,4 +187,57 @@ RSpec.describe 'Users API', type: :request do
       end
     end
   end
+
+  path "/api/v1/users/{id}" do 
+    get 'Returns specified user' do
+      tags 'User'
+      security [ bearer_auth: [] ]
+      produces 'application/json'
+      parameter name: :id, in: :path, type: :integer
+
+      let!(:user)           { FactoryBot.create(:user) }
+      let!(:other_user)           { FactoryBot.create(:user) }
+      let!(:Authorization)  { "Bearer #{AuthTokenService.encode(user.id)}" }
+      let!(:valid_header)   { { "Authorization": "Bearer #{AuthTokenService.encode(user.id)}" } }
+
+      response '200', 'when user exists' do
+        schema type: :object,
+        properties: {
+          id:              { type: :integer, default: 1 },
+          username:        { type: :string, default: 'Student99' },
+          created_at:      { type: :date, default: '2022-09-20T10:45:38.966Z' },
+          number_of_plans: { type: :integer, default: 1 }
+        },
+        required: [ 'id', 'username', 'created_at', 'number_of_plans' ],
+        example: {
+            id: 1,
+            username: 'Student99',
+            created_at: '2022-09-20T10:45:38.966Z',
+            number_of_plans: 1
+        }
+        
+        let(:id) { user.id }
+        run_test!
+      end
+
+      response '401', 'user is unauthorized' do
+        let!(:Authorization)  { nil }
+        
+        it "returns unauthorized when normal user tries to access other user's data" do
+          get "/api/v1/users/#{other_user.id}", headers: valid_header
+
+          expect(response).to have_http_status(:unauthorized)
+        end
+
+        let(:id) { user.id }
+        run_test!
+      end
+
+      # test for admin role
+      # response '404', "user with specified id doesn't exist" do        
+      #   let(:id) { plan.id + 1}
+      #   run_test!
+      # end
+    end
+  end
 end

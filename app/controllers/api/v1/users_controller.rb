@@ -1,6 +1,7 @@
 class Api::V1::UsersController < ApplicationController
   before_action :authenticate_user, only: %i[ index destroy show change_password ]
-  
+  before_action :authorize_user, only: :show
+
   rescue_from ActionController::ParameterMissing, with: :param_missing
 
   def create
@@ -27,9 +28,9 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
-  #def show
-  #  render json: { user: { username: current_user.username, created_at: current_user.created_at, last_login:  } }
-  #end
+  def show
+    render json: UserRepresenter.new(User.find(params[:id])).as_json, status: :ok
+  end
   
   # index and destroy actions are for admin users
   # that are yet to be added
@@ -40,6 +41,14 @@ class Api::V1::UsersController < ApplicationController
   end
 
   private
+
+  def authorize_user
+    user = User.find(params[:id])
+    render status: :unauthorized unless current_user == user # admin role condition to be added in the future
+  rescue ActiveRecord::RecordNotFound
+    # admin role condition to be added, to tell admin, that there is no such user
+    render status: :unauthorized
+  end
 
   def param_missing(e)
     parameter_missing(e, :unprocessable_entity)

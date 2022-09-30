@@ -6,6 +6,7 @@ Rails.application.routes.draw do
       resources :plans
       post '/register',        to: 'users#create'
       post '/change-password', to: 'users#change_password'
+      get  'users/:id',        to: 'users#show'
       #  get 'users/index'
       #  delete 'users/:id/destroy'
       post   '/login',  to: 'authentication#create'
