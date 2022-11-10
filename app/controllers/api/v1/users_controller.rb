@@ -32,6 +32,12 @@ class Api::V1::UsersController < ApplicationController
     render json: UserRepresenter.new(User.find(params[:id])).as_json, status: :ok
   end
   
+  def settings_show
+  end
+
+  def settings_edit
+  end
+
   # index and destroy actions are for admin users
   # that are yet to be added
   def index

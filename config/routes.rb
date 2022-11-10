@@ -4,6 +4,8 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :plans
+      get  '/remote-storage',  to: 'users#settings_show'
+      post '/remote-storage',  to: 'users#settings_edit'
       post '/register',        to: 'users#create'
       post '/change-password', to: 'users#change_password'
       get  'users/:id',        to: 'users#show'
