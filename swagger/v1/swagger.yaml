@@ -463,84 +463,42 @@ paths:
       - User
       security:
       - bearer_auth: []
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
       responses:
         '200':
-          description: when user exists
+          description: when everything goes fine
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  id:
-                    type: integer
-                    default: 1
-                  username:
+                  setting1:
                     type: string
-                    default: Student99
-                  created_at:
-                    type: date
-                    default: '2022-09-20T10:45:38.966Z'
-                  number_of_plans:
-                    type: integer
-                    default: 1
-                required:
-                - id
-                - username
-                - created_at
-                - number_of_plans
-                example:
-                  id: 1
-                  username: Student99
-                  created_at: '2022-09-20T10:45:38.966Z'
-                  number_of_plans: 1
-    post:
-      summary: Edits settings JSON
-      tags:
-      - User
-      security:
-      - bearer_auth: []
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        '200':
-          description: when user exists
+                    example: setting-value
+                  setting2:
+                    type: string
+                    example: setting-value
+        '422':
+          description: unprocessable entity
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  id:
-                    type: integer
-                    default: 1
-                  username:
-                    type: string
-                    default: Student99
-                  created_at:
-                    type: date
-                    default: '2022-09-20T10:45:38.966Z'
-                  number_of_plans:
-                    type: integer
-                    default: 1
+                  errors:
+                    type: object
+                    properties:
+                      Settings:
+                        type: array
+                        properties:
+                        - type: string
+                          default: weren't initialized yet, or they're not in JSON
+                            format
                 required:
-                - id
-                - username
-                - created_at
-                - number_of_plans
+                - errors
                 example:
-                  id: 1
-                  username: Student99
-                  created_at: '2022-09-20T10:45:38.966Z'
-                  number_of_plans: 1
+                  errors:
+                    Settings:
+                    - weren't initialized yet, or they're not in JSON format
 servers:
 - url: http://{developmentHost}
   variables:

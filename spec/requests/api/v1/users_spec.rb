@@ -136,6 +136,7 @@ RSpec.describe 'Users API', type: :request do
 
       let!(:user)           { FactoryBot.create(:user) }
       let!(:Authorization)  { "Bearer #{AuthTokenService.encode(user.id)}" }
+      let!(:authorization)  { "Bearer #{AuthTokenService.encode(user.id)}" }
       let!(:valid_header)   { { "Authorization": "Bearer #{AuthTokenService.encode(user.id)}" } }
       
       response '200', 'password change successful' do
@@ -196,7 +197,7 @@ RSpec.describe 'Users API', type: :request do
       parameter name: :id, in: :path, type: :integer
 
       let!(:user)           { FactoryBot.create(:user) }
-      let!(:other_user)           { FactoryBot.create(:user) }
+      let!(:other_user)     { FactoryBot.create(:user) }
       let!(:Authorization)  { "Bearer #{AuthTokenService.encode(user.id)}" }
       let!(:valid_header)   { { "Authorization": "Bearer #{AuthTokenService.encode(user.id)}" } }
 
@@ -246,64 +247,87 @@ RSpec.describe 'Users API', type: :request do
       tags 'User'
       security [ bearer_auth: [] ]
       produces 'application/json'
-      parameter name: :id, in: :path, type: :integer
 
-      let!(:user)           { FactoryBot.create(:user) }
-      let!(:other_user)           { FactoryBot.create(:user) }
-      let!(:Authorization)  { "Bearer #{AuthTokenService.encode(user.id)}" }
-      let!(:valid_header)   { { "Authorization": "Bearer #{AuthTokenService.encode(user.id)}" } }
+      
 
-      response '200', 'when user exists' do
+      response '200', 'when everything goes fine' do
         schema type: :object,
         properties: {
-          id:              { type: :integer, default: 1 },
-          username:        { type: :string, default: 'Student99' },
-          created_at:      { type: :date, default: '2022-09-20T10:45:38.966Z' },
-          number_of_plans: { type: :integer, default: 1 }
-        },
-        required: [ 'id', 'username', 'created_at', 'number_of_plans' ],
-        example: {
-            id: 1,
-            username: 'Student99',
-            created_at: '2022-09-20T10:45:38.966Z',
-            number_of_plans: 1
+          "setting1": { type: :string, example: "setting-value" },
+          "setting2": { type: :string, example: "setting-value" }
         }
-        
-        let(:id) { user.id }
+
+        let!(:user)           { FactoryBot.create(:user, settings: '{ "setting1": "setting-value", "setting2": "setting-value" }' ) }
+        let!(:other_user)     { FactoryBot.create(:user) }
+        let!(:Authorization)  { "Bearer #{AuthTokenService.encode(user.id)}" }
+        let!(:valid_header)   { { "Authorization": "Bearer #{AuthTokenService.encode(user.id)}" } }
+
+        run_test!
+      end
+
+      response '422', 'unprocessable entity' do
+        schema type: :object,
+        properties: {
+          errors: {
+            type: :object,
+            properties: {
+              Settings: {
+                type: :array, 
+                properties: [
+                  { type: :string, default: "weren't initialized yet, or they're not in JSON format" }
+                ]
+              }
+            }
+          }
+        },
+        required: [ 'errors' ],
+        example: {
+          errors: 
+          {
+            "Settings": [ "weren't initialized yet, or they're not in JSON format" ]
+          }
+        }
+  
+
+        let!(:user)           { FactoryBot.create(:user, settings: '' ) }
+        let!(:other_user)     { FactoryBot.create(:user) }
+        let!(:Authorization)  { "Bearer #{AuthTokenService.encode(user.id)}" }
+        let!(:valid_header)   { { "Authorization": "Bearer #{AuthTokenService.encode(user.id)}" } }
+
         run_test!
       end
     end
 
-    post 'Edits settings JSON' do
-      tags 'User'
-      security [ bearer_auth: [] ]
-      produces 'application/json'
-      parameter name: :id, in: :path, type: :integer
+    # post 'Edits settings JSON' do
+    #   tags 'User'
+    #   security [ bearer_auth: [] ]
+    #   produces 'application/json'
+    #   parameter name: :id, in: :path, type: :integer
 
-      let!(:user)           { FactoryBot.create(:user) }
-      let!(:other_user)           { FactoryBot.create(:user) }
-      let!(:Authorization)  { "Bearer #{AuthTokenService.encode(user.id)}" }
-      let!(:valid_header)   { { "Authorization": "Bearer #{AuthTokenService.encode(user.id)}" } }
+    #   let!(:user)           { FactoryBot.create(:user) }
+    #   let!(:other_user)           { FactoryBot.create(:user) }
+    #   let!(:Authorization)  { "Bearer #{AuthTokenService.encode(user.id)}" }
+    #   let!(:valid_header)   { { "Authorization": "Bearer #{AuthTokenService.encode(user.id)}" } }
 
-      response '200', 'when user exists' do
-        schema type: :object,
-        properties: {
-          id:              { type: :integer, default: 1 },
-          username:        { type: :string, default: 'Student99' },
-          created_at:      { type: :date, default: '2022-09-20T10:45:38.966Z' },
-          number_of_plans: { type: :integer, default: 1 }
-        },
-        required: [ 'id', 'username', 'created_at', 'number_of_plans' ],
-        example: {
-            id: 1,
-            username: 'Student99',
-            created_at: '2022-09-20T10:45:38.966Z',
-            number_of_plans: 1
-        }
+    #   response '200', 'when user exists' do
+    #     schema type: :object,
+    #     properties: {
+    #       id:              { type: :integer, default: 1 },
+    #       username:        { type: :string, default: 'Student99' },
+    #       created_at:      { type: :date, default: '2022-09-20T10:45:38.966Z' },
+    #       number_of_plans: { type: :integer, default: 1 }
+    #     },
+    #     required: [ 'id', 'username', 'created_at', 'number_of_plans' ],
+    #     example: {
+    #         id: 1,
+    #         username: 'Student99',
+    #         created_at: '2022-09-20T10:45:38.966Z',
+    #         number_of_plans: 1
+    #     }
         
-        let(:id) { user.id }
-        run_test!
-      end
-    end
+    #     let(:id) { user.id }
+    #     run_test!
+    #   end
+    # end
   end
 end

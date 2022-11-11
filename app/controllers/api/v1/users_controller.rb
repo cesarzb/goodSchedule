@@ -1,6 +1,6 @@
 class Api::V1::UsersController < ApplicationController
-  before_action :authenticate_user, only: %i[ index destroy show change_password ]
-  before_action :authorize_user, only: :show
+  before_action :authenticate_user, except: %i[ create ]
+  before_action :authorize_user, only: %i[ show ]
 
   rescue_from ActionController::ParameterMissing, with: :param_missing
 
@@ -33,6 +33,9 @@ class Api::V1::UsersController < ApplicationController
   end
   
   def settings_show
+    render json: JSON.parse(current_user.settings), status: :ok
+  rescue JSON::ParserError, TypeError
+    render json: {errors: { "Settings": [ "weren't initialized yet, or they're not in JSON format" ] } }, status: :unprocessable_entity
   end
 
   def settings_edit
