@@ -248,13 +248,16 @@ RSpec.describe 'Users API', type: :request do
       security [ bearer_auth: [] ]
       produces 'application/json'
 
-      
-
       response '200', 'when everything goes fine' do
-        schema type: :object,
+        schema type: :object, 
         properties: {
-          "setting1": { type: :string, example: "setting-value" },
-          "setting2": { type: :string, example: "setting-value" }
+          settings: {
+            type: :object,
+            properties: {
+              "setting1": { type: :string, example: "setting-value" },
+              "setting2": { type: :string, example: "setting-value" }
+            }
+          }
         }
 
         let!(:user)           { FactoryBot.create(:user, settings: '{ "setting1": "setting-value", "setting2": "setting-value" }' ) }
@@ -298,36 +301,40 @@ RSpec.describe 'Users API', type: :request do
       end
     end
 
-    # post 'Edits settings JSON' do
-    #   tags 'User'
-    #   security [ bearer_auth: [] ]
-    #   produces 'application/json'
-    #   parameter name: :id, in: :path, type: :integer
+    post 'Edits settings JSON' do
+      tags 'User'
+      security [ bearer_auth: [] ]
+      consumes 'application/json'
+      parameter name: :settings, in: :body, schema: {
+          type: :object,
+          properties: {
+            settings: {
+              type: :object,
+              properties: {
+                "setting1": { type: :string, example: "setting-value" },
+                "setting2": { type: :string, example: "setting-value" }
+              }
+            }
+          }
+        }
 
-    #   let!(:user)           { FactoryBot.create(:user) }
-    #   let!(:other_user)           { FactoryBot.create(:user) }
-    #   let!(:Authorization)  { "Bearer #{AuthTokenService.encode(user.id)}" }
-    #   let!(:valid_header)   { { "Authorization": "Bearer #{AuthTokenService.encode(user.id)}" } }
+      let!(:user)           { FactoryBot.create(:user) }
+      let!(:other_user)     { FactoryBot.create(:user) }
+      let!(:Authorization)  { "Bearer #{AuthTokenService.encode(user.id)}" }
+      let!(:valid_header)   { { "Authorization": "Bearer #{AuthTokenService.encode(user.id)}" } }
+      let!(:settings)       { { "settings": { "setting1": "setting-value", "setting2": "setting-value" } } }
 
-    #   response '200', 'when user exists' do
-    #     schema type: :object,
-    #     properties: {
-    #       id:              { type: :integer, default: 1 },
-    #       username:        { type: :string, default: 'Student99' },
-    #       created_at:      { type: :date, default: '2022-09-20T10:45:38.966Z' },
-    #       number_of_plans: { type: :integer, default: 1 }
-    #     },
-    #     required: [ 'id', 'username', 'created_at', 'number_of_plans' ],
-    #     example: {
-    #         id: 1,
-    #         username: 'Student99',
-    #         created_at: '2022-09-20T10:45:38.966Z',
-    #         number_of_plans: 1
-    #     }
-        
-    #     let(:id) { user.id }
-    #     run_test!
-    #   end
-    # end
+      response '200', 'when user exists' do
+        it "changes users settings" do
+          # binding.irb
+          post api_v1_remote_storage_path, params: settings.to_json
+          # binding.irb
+          user.reload
+          expect(user.settings).to eq(JSON.generate(settings))
+        end
+
+        run_test!
+      end
+    end
   end
 end

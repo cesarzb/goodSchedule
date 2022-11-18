@@ -20,7 +20,6 @@ module Api
                 token, _options = token_and_options(request)
                 current_user = User.find(AuthTokenService.decode(token))
                 current_user.update(token_expiration: Time.now)
-
                 render status: :no_content
             end
 

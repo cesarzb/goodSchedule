@@ -39,6 +39,10 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def settings_edit
+    # binding.irb
+    current_user.update_attribute(:settings, { "settings": params[:settings] }.to_json)
+    # binding.irb
+    render status: :ok
   end
 
   # index and destroy actions are for admin users

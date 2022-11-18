@@ -1,4 +1,4 @@
-# fly.toml file generated for ultimatescheduler on 2022-10-15T00:59:35+02:00
+# fly.toml file generated for ultimatescheduler on 2022-11-11T13:36:37+01:00
 
 app = "ultimatescheduler"
 kill_signal = "SIGINT"

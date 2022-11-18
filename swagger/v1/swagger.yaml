@@ -471,12 +471,15 @@ paths:
               schema:
                 type: object
                 properties:
-                  setting1:
-                    type: string
-                    example: setting-value
-                  setting2:
-                    type: string
-                    example: setting-value
+                  settings:
+                    type: object
+                    properties:
+                      setting1:
+                        type: string
+                        example: setting-value
+                      setting2:
+                        type: string
+                        example: setting-value
         '422':
           description: unprocessable entity
           content:
@@ -499,6 +502,31 @@ paths:
                   errors:
                     Settings:
                     - weren't initialized yet, or they're not in JSON format
+    post:
+      summary: Edits settings JSON
+      tags:
+      - User
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: when user exists
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                settings:
+                  type: object
+                  properties:
+                    setting1:
+                      type: string
+                      example: setting-value
+                    setting2:
+                      type: string
+                      example: setting-value
 servers:
 - url: http://{developmentHost}
   variables:
