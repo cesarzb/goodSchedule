@@ -3,7 +3,6 @@ module Api
         class AuthenticationController < ApplicationController
             include ActionController::HttpAuthentication::Token
             class AuthenticationError < StandardError; end
-            before_action :authenticate_user, only: :destroy
             
             rescue_from ActionController::ParameterMissing, with: :param_missing
             rescue_from AuthenticationController::AuthenticationError, with: :authentication_error
@@ -17,9 +16,10 @@ module Api
             end
 
             def destroy
-                token, _options = token_and_options(request)
-                current_user = User.find(AuthTokenService.decode(token))
-                current_user.update(token_expiration: Time.now)
+                if current_user
+                    token, _options = token_and_options(request)
+                    current_user.update(token_expiration: Time.now)
+                end
                 render status: :no_content
             end
 
